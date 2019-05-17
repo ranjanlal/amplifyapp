@@ -20,14 +20,17 @@ class Board extends React.Component {
     }
 
     handleClick(i) {
+        if (!this.state.xIsNext) {
+            return;
+        }
         const squares = this.state.squares.slice();
         if (calculateWinner(squares) || squares[i]) {
             return;
         }
-        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        squares[i] = 'X';
         this.setState({
             squares: squares,
-            xIsNext: !this.state.xIsNext,
+            xIsNext: false,
         });
     }
 
@@ -40,6 +43,31 @@ class Board extends React.Component {
         );
     }
 
+    machinePlayer(winner) {
+        if (!this.state.xIsNext) {
+            setTimeout(() => {
+                const squares = this.state.squares.slice();
+                while (!winner) {
+                    const machine_position = Math.floor(Math.random() * 9);
+                    if (squares[machine_position]
+                        || squares[machine_position] === 'O'
+                        || squares[machine_position] === 'X'
+                    ) {
+                        continue;
+                    }
+                    if (!winner) {
+                        squares[machine_position] = 'O';
+                        this.setState({
+                            squares: squares,
+                            xIsNext: true,
+                        });
+                    }
+                    break;
+                }
+            }, 2000);
+        }
+    }
+
     render() {
 
         const winner = calculateWinner(this.state.squares);
@@ -49,6 +77,9 @@ class Board extends React.Component {
         } else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
         }
+
+        // next player machine
+        this.machinePlayer(winner);
 
         return (
             <div>
